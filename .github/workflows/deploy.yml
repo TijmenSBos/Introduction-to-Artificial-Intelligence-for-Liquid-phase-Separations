@@ -1,0 +1,10 @@
+Introduction-to-Artificial-Intelligence-for-Liquid-phase-Separations/
+├─ requirements.txt
+├─ .github/
+│  └─ workflows/
+│     └─ deploy.yml
+└─ content/
+   ├─ Applications_AI_chromatography_TijmenBos_IDEAS.ipynb
+   ├─ Classification_chromatograph_TijmenBos_IDEAS.ipynb
+   ├─ Intelligent_machine_learning_TijmenBos_IDEAS.ipynb
+   └─ Optimization_liquid_phase_separations_TijmenBos_IDEAS.ipynb
