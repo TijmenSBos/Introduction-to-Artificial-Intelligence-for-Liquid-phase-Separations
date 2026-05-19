@@ -31,19 +31,33 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Validate and normalize notebooks
         run: |
           python - <<'PY'
           from pathlib import Path
+          import json
           import nbformat
 
           for path in Path("content").glob("*.ipynb"):
               print(f"Checking {path}")
-              nb = nbformat.read(path, as_version=4)
 
-              if "metadata" not in nb or nb.metadata is None:
-                  nb.metadata = {}
+              text = path.read_text(encoding="utf-8")
+              data = json.loads(text)
+
+              # Repair notebooks that were accidentally saved as a JSON string
+              # containing notebook JSON, instead of as a notebook JSON object.
+              if isinstance(data, str):
+                  print(f"  Double-encoded notebook detected; repairing {path}")
+                  data = json.loads(data)
+
+              if not isinstance(data, dict):
+                  raise TypeError(f"{path} is not a valid notebook JSON object")
+
+              nb = nbformat.from_dict(data)
+
+              if nb.get("nbformat", 4) != 4:
+                  nb = nbformat.convert(nb, 4)
 
               nb.metadata.setdefault("kernelspec", {
                   "display_name": "Python (Pyodide)",
@@ -60,9 +74,11 @@ jobs:
               })
 
               nbformat.validate(nb)
-              nbformat.write(nb, path)
+              nbformat.write(nb, str(path))
+
+          print("All notebooks validated and normalized.")
           PY
-          
+
       - name: Build JupyterLite site
         run: |
           jupyter lite build --contents content --output-dir dist
