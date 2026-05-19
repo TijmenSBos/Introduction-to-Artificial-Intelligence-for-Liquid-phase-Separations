@@ -2,3 +2,5 @@ jupyterlite-core
 jupyterlite-pyodide-kernel
 jupyterlab
 notebook
+nbformat
+jupyter-server
